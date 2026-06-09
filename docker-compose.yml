@@ -1,0 +1,55 @@
+services:
+  voice-agent:
+    build: .
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data  # Persist SQLite database across restarts
+    network_mode: host     # Recommended for WebRTC/Voice low latency
+
+  # Uncomment below for development (hot-reload + source mount)
+  # voice-agent-dev:
+  #   build: .
+  #   restart: unless-stopped
+  #   env_file:
+  #     - .env
+  #   volumes:
+  #     - .:/app            # Source hot-reload (remove in production)
+  #     - ./data:/app/data  # Persist database
+  #   network_mode: host
+  #   command: python agent.py dev
+
+  dashboard:
+    build:
+      context: ./dashboard
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data  # Share database with voice agent
+    depends_on:
+      - voice-agent
+
+  mongodb:
+    image: mongo:7.0
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: agriforge_voice
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+volumes:
+  mongodb_data:
+    driver: local

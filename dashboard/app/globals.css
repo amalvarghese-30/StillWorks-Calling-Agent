@@ -1,0 +1,101 @@
+@import "tailwindcss";
+
+/* ================================================================
+   AGRIFORGE DESIGN SYSTEM — Light Theme
+   Dark mode-ready via CSS variables (dark mode not implemented in Phase 3)
+   ================================================================ */
+
+@theme {
+  /* Primary Green */
+  --color-agriforce-green: #16A34A;
+  --color-agriforce-green-dark: #15803D;
+  --color-agriforce-green-light: #DCFCE7;
+
+  /* Harvest Gold */
+  --color-agriforce-gold: #CA8A04;
+  --color-agriforce-gold-light: #FEF9C3;
+
+  /* Surfaces */
+  --color-agriforce-bg: #F8FAF7;
+  --color-agriforce-surface: #FFFFFF;
+
+  /* Semantic */
+  --color-agriforce-border: #E5E7EB;
+  --color-agriforce-text: #111827;
+  --color-agriforce-muted: #6B7280;
+}
+
+:root {
+  /* RGB versions for opacity utilities */
+  --primary-rgb: 22, 163, 74;
+  --primary-dark-rgb: 21, 128, 61;
+  --gold-rgb: 202, 138, 4;
+  --text-rgb: 17, 24, 39;
+  --muted-rgb: 107, 114, 128;
+
+  /* Radius */
+  --radius: 0.625rem;
+  --radius-sm: 0.375rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+}
+
+body {
+  color: #111827;
+  background: #F8FAF7;
+  min-height: 100vh;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar — light theme */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #F3F4F6;
+  border-radius: 3px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #D1D5DB;
+  border-radius: 3px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #9CA3AF;
+}
+
+/* Shadcn-compatible CSS variable mapping */
+@layer base {
+  :root {
+    --background: 80 6% 97%;
+    --foreground: 0 0% 7%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 7%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 7%;
+    --primary: 142 72% 36%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 7%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 42%;
+    --accent: 142 72% 95%;
+    --accent-foreground: 142 72% 30%;
+    --destructive: 0 84% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 142 72% 36%;
+    --radius: 0.625rem;
+    --chart-1: 142 72% 36%;
+    --chart-2: 46 94% 40%;
+    --chart-3: 220 14% 60%;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
