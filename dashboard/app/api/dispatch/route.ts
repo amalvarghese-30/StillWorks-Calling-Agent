@@ -19,8 +19,8 @@ export async function POST(request: Request) {
             call_type: campaignType || 'follow_up',
             language: language || 'ml',
             user_prompt: prompt || '',
-            model_provider: modelProvider || process.env.LLM_PROVIDER || 'groq',
-            voice_id: voice || 'anushka',
+            model_provider: modelProvider || process.env.LLM_PROVIDER || 'openai',
+            voice_id: voice || 'kavitha',
         });
 
         const dispatch = await agentDispatchClient.createDispatch(

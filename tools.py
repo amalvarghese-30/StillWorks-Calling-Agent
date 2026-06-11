@@ -2,7 +2,7 @@
 Function tools for Manas Group India voice agent.
 Uses LiveKit's llm.ToolContext pattern with async methods.
 
-Phase 1: 14 tools — 8 original + lock_language, log_budget, log_timeline, generate_quote.
+Phase 1: 12 tools — 8 original + lock_language, log_budget, log_timeline, generate_quote.
 All tools are call_memory-aware — they update conversation context on each call.
 """
 
@@ -25,6 +25,9 @@ class ManasAgentFunctions(llm.ToolContext):
         self.inbound_caller_identity = None
         self.current_call_id = None
         self.call_memory = call_memory
+        self.session = None          # set by entrypoint after AgentSession is created
+        self._build_stt_fn = None    # set by entrypoint to enable STT rebuild on language switch
+        self._build_tts_fn = None    # set by entrypoint to enable TTS rebuild on language switch
 
         if db is not None:
             self.db = db
@@ -280,6 +283,24 @@ class ManasAgentFunctions(llm.ToolContext):
         if self.call_memory:
             self.call_memory.lock_language(language)
             logger.info(f"Language locked to: {language}")
+
+        # Rebuild STT for the selected language (if session is wired)
+        if self.session and self._build_stt_fn:
+            try:
+                new_stt = self._build_stt_fn(language)
+                self.session.stt = new_stt
+                logger.info(f"STT rebuilt for language: {language}")
+            except Exception as e:
+                logger.warning(f"Could not rebuild STT: {e}")
+
+        # Rebuild TTS for the selected language (if session is wired)
+        if self.session and self._build_tts_fn:
+            try:
+                new_tts = self._build_tts_fn(language=language)
+                self.session.tts = new_tts
+                logger.info(f"TTS rebuilt for language: {language}")
+            except Exception as e:
+                logger.warning(f"Could not rebuild TTS: {e}")
 
         # Return the confirmation message in the selected language
         confirmations = config.LANGUAGE_CONFIRMATION_MESSAGES

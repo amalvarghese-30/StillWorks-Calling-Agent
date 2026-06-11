@@ -6,11 +6,11 @@ export async function GET() {
     const dbPath = process.env.DATABASE_PATH || 'data/manas_group.db';
 
     // Read agent config from env
-    const model = process.env.LLM_MODEL || process.env.GROQ_MODEL || 'Llama 4 Scout 17B';
+    const model = process.env.LLM_MODEL || process.env.OPENAI_LLM_MODEL || 'GPT-4o';
     const stt = process.env.DEEPGRAM_STT_LANGUAGE
       ? `Deepgram Nova-3 (${process.env.DEEPGRAM_STT_LANGUAGE})`
       : 'Deepgram Nova-3';
-    const tts = process.env.TTS_PROVIDER || 'OpenAI TTS HD / Sarvam';
+    const tts = process.env.TTS_PROVIDER || 'OpenAI TTS / Sarvam';
 
     const callsCol = await getCollection('calls');
     if (callsCol) {

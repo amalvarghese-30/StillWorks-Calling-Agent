@@ -17,11 +17,11 @@ export default function SettingsPage() {
             <Separator />
             <div className="space-y-1">
               <span className="font-medium text-[#111827]">LLM Provider</span>
-              <p>Groq / OpenAI (LLM_PROVIDER env var)</p>
+              <p>OpenAI GPT-4o (LLM_PROVIDER env var)</p>
             </div>
             <div className="space-y-1">
               <span className="font-medium text-[#111827]">TTS Provider</span>
-              <p>OpenAI TTS HD / Sarvam (TTS_PROVIDER env var)</p>
+              <p>OpenAI TTS / Sarvam (TTS_PROVIDER env var)</p>
             </div>
             <div className="space-y-1">
               <span className="font-medium text-[#111827]">STT Provider</span>

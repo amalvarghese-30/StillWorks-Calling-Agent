@@ -20,8 +20,8 @@ async def main():
         "phone_number": phone,
         "call_type": campaign,
         "language": language,
-        "model_provider": "groq",
-        "voice_id": "anushka",
+        "model_provider": "openai",
+        "voice_id": "kavitha",
         "user_prompt": "Customer inquired about John Deere tractor",
     })
 

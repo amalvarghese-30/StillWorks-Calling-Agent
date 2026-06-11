@@ -78,8 +78,8 @@ export async function GET() {
       webhooks: { total: webhookEvents, failures: webhookFailures },
       system: {
         dbBackend: process.env.DB_BACKEND || 'sqlite',
-        llmProvider: process.env.LLM_PROVIDER || 'groq',
-        ttsProvider: process.env.TTS_PROVIDER || 'deepgram',
+        llmProvider: process.env.LLM_PROVIDER || 'openai',
+        ttsProvider: process.env.TTS_PROVIDER || 'sarvam',
         sttProvider: process.env.DEEPGRAM_STT_MODEL ? 'deepgram' : 'unknown',
       },
     });

@@ -40,7 +40,7 @@ def _build_tts(config_provider: str = None, config_voice: str = None,
 
     Priority: language map > config > env var > default.
     Malayalam (ml) and Hindi (hi) → Sarvam for native-quality voices.
-    English (en) → OpenAI TTS HD for high-quality output.
+    English (en) → OpenAI TTS for real-time output.
     """
     # Check language-based mapping first
     if language and language in config.LANGUAGE_TTS_MAP:
@@ -53,7 +53,10 @@ def _build_tts(config_provider: str = None, config_voice: str = None,
         voice = config_voice
 
     # Sarvam voice names force Sarvam provider
-    if voice in ["anushka", "aravind", "amartya", "dhruv", "manisha", "vidya", "arya", "abhilash", "karun", "hitesh"]:
+    if voice in ["shubh", "ritu", "rahul", "pooja", "simran", "kavya", "amit", "ratan", "rohan",
+                 "dev", "ishita", "shreya", "manan", "sumit", "priya", "aditya", "kabir", "neha",
+                 "varun", "roopa", "aayan", "ashutosh", "advait", "amelia", "sophia", "suhani",
+                 "rupali", "tanya", "shruti", "kavitha"]:
         provider = "sarvam"
 
     if provider == "cartesia":
@@ -65,11 +68,16 @@ def _build_tts(config_provider: str = None, config_voice: str = None,
     if provider == "sarvam":
         logger.info(f"Using Sarvam TTS (Voice: {voice})")
         model = os.getenv("SARVAM_TTS_MODEL", config.SARVAM_MODEL)
-        tts_voice = voice or os.getenv("SARVAM_VOICE", "anushka")
-        VALID_SARVAM_SPEAKERS = {"anushka", "manisha", "vidya", "arya", "abhilash", "karun", "hitesh"}
+        tts_voice = voice or os.getenv("SARVAM_VOICE", "kavitha")
+        VALID_SARVAM_SPEAKERS = {
+            "shubh", "ritu", "rahul", "pooja", "simran", "kavya", "amit", "ratan", "rohan",
+            "dev", "ishita", "shreya", "manan", "sumit", "priya", "aditya", "kabir", "neha",
+            "varun", "roopa", "aayan", "ashutosh", "advait", "amelia", "sophia", "suhani",
+            "rupali", "tanya", "shruti", "kavitha",
+        }
         if tts_voice not in VALID_SARVAM_SPEAKERS:
-            logger.warning(f"Voice '{tts_voice}' not valid for Sarvam, falling back to anushka")
-            tts_voice = "anushka"
+            logger.warning(f"Voice '{tts_voice}' not valid for Sarvam, falling back to kavitha")
+            tts_voice = "kavitha"
         if language and language in config.LANGUAGE_TTS_MAP:
             lang_code = config.LANGUAGE_TTS_MAP[language].get("language", "en-IN")
         else:
@@ -81,10 +89,10 @@ def _build_tts(config_provider: str = None, config_voice: str = None,
         model = os.getenv("DEEPGRAM_TTS_MODEL", "aura-asteria-en")
         return deepgram.TTS(model=model)
 
-    # Default to OpenAI TTS HD for English
+    # Default to OpenAI TTS for English
     if provider == "openai" or provider == "default":
-        logger.info(f"Using OpenAI TTS HD (Voice: {voice or config.DEFAULT_TTS_VOICE})")
-        model = os.getenv("OPENAI_TTS_MODEL", "tts-1-hd")
+        logger.info(f"Using OpenAI TTS (Voice: {voice or config.DEFAULT_TTS_VOICE})")
+        model = os.getenv("OPENAI_TTS_MODEL", "tts-1")
         tts_voice = voice or os.getenv("OPENAI_TTS_VOICE", config.DEFAULT_TTS_VOICE)
         return openai.TTS(model=model, voice=tts_voice)
 
@@ -97,18 +105,23 @@ def _build_tts(config_provider: str = None, config_voice: str = None,
 
 def _build_stt(language: str = None):
     """Configure STT with language awareness and nova-3 model.
-    Deepgram nova-3 with 'en' supports multi-language code switching.
+    Deepgram nova-3 with 'en-IN' supports Indian-accented English and multi-language code switching.
     For Hindi-only, 'hi' provides better accuracy.
-    For Malayalam, 'en' with code-switching is the best available option.
+    For Malayalam, 'en-IN' with smart_format gives the best available code-switch detection.
+    Deepgram does not have a dedicated Malayalam model.
     """
     stt_language = os.getenv("DEEPGRAM_STT_LANGUAGE", config.STT_LANGUAGE)
     if language == "hi":
         stt_language = "hi"
     elif language == "ml":
-        stt_language = "en"
+        stt_language = "en-IN"
 
     logger.info(f"Using Deepgram STT (model={config.STT_MODEL}, language={stt_language})")
-    return deepgram.STT(model=config.STT_MODEL, language=stt_language)
+    return deepgram.STT(
+        model=config.STT_MODEL,
+        language=stt_language,
+        smart_format=True,
+    )
 
 
 def _build_vad():
@@ -136,13 +149,9 @@ def _build_llm(config_provider: str = None):
     provider = (config_provider or os.getenv("LLM_PROVIDER", config.DEFAULT_LLM_PROVIDER)).lower()
 
     if provider == "groq":
-        logger.info("Using Groq LLM")
-        return openai.LLM(
-            base_url="https://api.groq.com/openai/v1",
-            api_key=os.getenv("GROQ_API_KEY"),
-            model=os.getenv("GROQ_MODEL", config.GROQ_MODEL),
-            temperature=float(os.getenv("GROQ_TEMPERATURE", str(config.GROQ_TEMPERATURE))),
-        )
+        logger.warning("Groq is deprecated — using OpenAI instead")
+        logger.info("Using OpenAI LLM")
+        return openai.LLM(model=config.OPENAI_LLM_MODEL)
 
     # Default to OpenAI
     logger.info("Using OpenAI LLM")
@@ -153,7 +162,7 @@ class ManasAssistant(Agent):
     """
     AI agent for Manas Group India — agricultural machinery dealership.
     Handles inbound and outbound calls with full trilingual support
-    (Malayalam, English, Hindi) and 8 function tools for customer service.
+    (Malayalam, English, Hindi) and 12 function tools for customer service.
     """
     def __init__(self, tools: list) -> None:
         super().__init__(
@@ -262,6 +271,11 @@ async def entrypoint(ctx: agents.JobContext):
         llm=_build_llm(config_dict.get("model_provider")),
         tts=tts,
     )
+
+    # Wire fnc_ctx so lock_language() can rebuild STT/TTS when language changes
+    fnc_ctx.session = session
+    fnc_ctx._build_stt_fn = _build_stt
+    fnc_ctx._build_tts_fn = _build_tts
 
     await session.start(
         room=ctx.room,

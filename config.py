@@ -55,9 +55,9 @@ LANGUAGE_CONFIRMATION_MESSAGES = {
 
 # TTS voice mapping per language
 LANGUAGE_TTS_MAP = {
-    "ml": {"provider": "sarvam", "voice": "manisha", "model": "bulbul:v2", "language": "ml-IN"},
-    "hi": {"provider": "sarvam", "voice": "manisha", "model": "bulbul:v2", "language": "hi-IN"},
-    "en": {"provider": "openai", "voice": "alloy", "model": "tts-1-hd", "language": "en-US"},
+    "ml": {"provider": "sarvam", "voice": "kavitha", "model": "bulbul:v3", "language": "ml-IN"},
+    "hi": {"provider": "sarvam", "voice": "kavitha", "model": "bulbul:v3", "language": "hi-IN"},
+    "en": {"provider": "openai", "voice": "alloy", "model": "tts-1", "language": "en-US"},
 }
 
 # =============================================================================
@@ -65,18 +65,16 @@ LANGUAGE_TTS_MAP = {
 # =============================================================================
 
 INITIAL_GREETING = (
-    "The user has picked up the call. Introduce yourself as ManasAI from Manas Group India. "
-    "Start in Malayalam: 'നമസ്കാരം, ഇത് മാനസ് ഗ്രൂപ്പ് ഇന്ത്യയിൽ നിന്നുള്ള മാനസ്എഐ ആണ്. "
-    "ഞാൻ നിങ്ങളെ എങ്ങനെ സഹായിക്കാൻ കധിയും?' "
-    "If the customer responds in English or Hindi, switch immediately. "
-    "If this is a service reminder outbound call, mention the specific reason for calling."
+    "The user has picked up the call. Follow the LANGUAGE RULES in your system prompt: "
+    "greet ONCE, ask which language they prefer, call lock_language() with their choice, "
+    "then proceed with the call. If this is a service reminder outbound call, "
+    "mention the specific reason for calling."
 )
 
 INBOUND_GREETING = (
-    "A customer has just connected on the inbound line. Greet them as ManasAI from Manas Group India. "
-    "Start in Malayalam: 'നമസ്കാരം, മാനസ് ഗ്രൂപ്പ് ഇന്ത്യയിലേക്ക് സ്വാഗതം. ഞാൻ മാനസ്എഐ ആണ്. "
-    "എനിക്ക് നിങ്ങളെ എങ്ങനെ സഹായിക്കാൻ കധിയും?' "
-    "Listen carefully to the customer's first response to detect language and switch if needed."
+    "A customer has just connected on the inbound line. Follow the LANGUAGE RULES in your system prompt: "
+    "greet ONCE, ask which language they prefer, call lock_language() with their choice, "
+    "then ask how you can help."
 )
 
 fallback_greeting = (
@@ -94,7 +92,7 @@ OUTBOUND_CALL_WINDOW_END = os.getenv("OUTBOUND_CALL_WINDOW_END", "18:00")
 
 STT_PROVIDER = "deepgram"
 STT_MODEL = os.getenv("DEEPGRAM_STT_MODEL", "nova-3")
-STT_LANGUAGE = os.getenv("DEEPGRAM_STT_LANGUAGE", "en")  # "en" supports multi-language code switching
+STT_LANGUAGE = os.getenv("DEEPGRAM_STT_LANGUAGE", "en-IN")  # en-IN for Indian accents and code-switching
 
 # =============================================================================
 #  TEXT-TO-SPEECH (TTS) SETTINGS
@@ -104,7 +102,7 @@ DEFAULT_TTS_PROVIDER = os.getenv("TTS_PROVIDER", "sarvam").lower()
 DEFAULT_TTS_VOICE = "alloy"
 
 # Sarvam AI (Indian voices — Malayalam, Hindi)
-SARVAM_MODEL = os.getenv("SARVAM_TTS_MODEL", "bulbul:v2")
+SARVAM_MODEL = os.getenv("SARVAM_TTS_MODEL", "bulbul:v3")
 SARVAM_LANGUAGE = os.getenv("SARVAM_LANGUAGE", "en-IN")
 
 # Cartesia
@@ -115,15 +113,11 @@ CARTESIA_VOICE = os.getenv("CARTESIA_TTS_VOICE", "f786b574-daa5-4673-aa0c-cbe3e8
 #  LARGE LANGUAGE MODEL (LLM) SETTINGS
 # =============================================================================
 
-DEFAULT_LLM_PROVIDER = os.getenv("LLM_PROVIDER", "groq").lower()
-DEFAULT_LLM_MODEL = os.getenv("GROQ_MODEL", "meta-llama/llama-4-scout-17b-16e-instruct")
+DEFAULT_LLM_PROVIDER = os.getenv("LLM_PROVIDER", "openai").lower()
+DEFAULT_LLM_MODEL = os.getenv("OPENAI_LLM_MODEL", "gpt-4o")
 
-# Groq
-GROQ_MODEL = os.getenv("GROQ_MODEL", "meta-llama/llama-4-scout-17b-16e-instruct")
-GROQ_TEMPERATURE = float(os.getenv("GROQ_TEMPERATURE", "0.7"))
-
-# OpenAI
-OPENAI_LLM_MODEL = os.getenv("OPENAI_LLM_MODEL", "gpt-4o-mini")
+# OpenAI (Primary LLM)
+OPENAI_LLM_MODEL = os.getenv("OPENAI_LLM_MODEL", "gpt-4o")
 
 # =============================================================================
 #  TELEPHONY & SIP
@@ -192,9 +186,9 @@ FINANCING_PARTNER_BANKS = [
 VAD_PROFILES = {
     "balanced": {
         "label": "Balanced",
-        "activation_threshold": 0.5,
-        "min_silence_duration": 0.4,
-        "padding_duration": 0.15,
+        "activation_threshold": 0.4,
+        "min_silence_duration": 0.7,
+        "padding_duration": 0.1,
     },
     "aggressive": {
         "label": "Aggressive (Responsive)",
@@ -212,7 +206,7 @@ VAD_PROFILES = {
 DEFAULT_VAD_PROFILE = os.getenv("VAD_PROFILE", "balanced")
 
 # Interruption control
-INTERRUPTION_MIN_SPEECH_DURATION = 0.8
+INTERRUPTION_MIN_SPEECH_DURATION = 0.3
 
 # =============================================================================
 #  LEAD SCORING WEIGHTS

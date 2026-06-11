@@ -130,9 +130,8 @@ export default function CallDispatcher() {
                             <select
                                 className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:ring-2 focus:ring-manas-green"
                                 name="modelProvider"
-                                defaultValue="groq"
+                                defaultValue="openai"
                             >
-                                <option value="groq">Groq (Llama 4 Scout 17B)</option>
                                 <option value="openai">OpenAI (GPT-4o)</option>
                             </select>
                         </div>
@@ -141,14 +140,22 @@ export default function CallDispatcher() {
                             <select
                                 className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:ring-2 focus:ring-manas-green"
                                 name="voice"
-                                defaultValue="anushka"
+                                defaultValue="kavitha"
                             >
-                                <option value="anushka">Anushka (Female - Indian)</option>
-                                <option value="manisha">Manisha (Female - Indian)</option>
-                                <option value="vidya">Vidya (Female - Indian)</option>
-                                <option value="arya">Arya (Female - Indian)</option>
-                                <option value="abhilash">Abhilash (Male - Indian)</option>
-                                <option value="karun">Karun (Male - Indian)</option>
+                                <option value="kavitha">Kavitha (Female - South Indian)</option>
+                                <option value="suhani">Suhani (Female - Indian)</option>
+                                <option value="priya">Priya (Female - Indian)</option>
+                                <option value="kavya">Kavya (Female - Indian)</option>
+                                <option value="neha">Neha (Female - Indian)</option>
+                                <option value="shreya">Shreya (Female - Indian)</option>
+                                <option value="shruti">Shruti (Female - Indian)</option>
+                                <option value="tanya">Tanya (Female - Indian)</option>
+                                <option value="ritu">Ritu (Female - Indian)</option>
+                                <option value="pooja">Pooja (Female - Indian)</option>
+                                <option value="simran">Simran (Female - Indian)</option>
+                                <option value="ishita">Ishita (Female - Indian)</option>
+                                <option value="rupali">Rupali (Female - Indian)</option>
+                                <option value="roopa">Roopa (Female - Indian)</option>
                             </select>
                         </div>
                     </div>

@@ -155,19 +155,10 @@ async def handle_outbound_call(ctx: agents.JobContext, session, fnc_ctx,
     campaign_type = config_dict.get("call_type", "")
     campaign_config = config.CAMPAIGN_TYPES.get(campaign_type, {})
     user_prompt = config_dict.get("user_prompt", "")
-    language_options = ", ".join(f"{v}" for v in config.LANGUAGE_OPTIONS.values())
 
     greeting_instructions = (
         f"You are calling {phone_number}. Call lookup_user({phone_number}) first.\n\n"
-        f"CRITICAL — LANGUAGE SELECTION FLOW:\n"
-        f"1. Introduce yourself: 'Hello, this is AgriForge AI from Manus Group India.'\n"
-        f"2. Briefly state the reason for your call.\n"
-        f"3. Ask: 'Which language would you prefer — {language_options}?'\n"
-        f"4. Wait for their answer.\n"
-        f"5. IMMEDIATELY call the lock_language() tool with their choice (en, hi, or ml).\n"
-        f"6. The lock_language tool will confirm in their language.\n"
-        f"7. Then proceed with the conversation.\n\n"
-        f"NEVER switch language unless the customer explicitly asks to change.\n"
+        f"Call context: outbound {campaign_type or 'general'} call.\n"
     )
 
     if user_prompt:

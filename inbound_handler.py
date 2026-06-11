@@ -128,19 +128,10 @@ async def handle_inbound_call(ctx: agents.JobContext, session, fnc_ctx, config_d
     await asyncio.sleep(0.5)
 
     phone = caller_phone or "the caller"
-    language_options = ", ".join(f"{v}" for v in config.LANGUAGE_OPTIONS.values())
 
     greeting_instructions = (
         f"The caller's phone number is {phone}. Call lookup_user({phone}) first.\n\n"
-        f"CRITICAL — LANGUAGE SELECTION FLOW:\n"
-        f"1. Welcome the caller: 'Welcome to AgriForge. Thank you for calling Manas Group India.'\n"
-        f"2. Ask: 'Which language would you prefer — {language_options}?'\n"
-        f"3. Wait for their answer.\n"
-        f"4. IMMEDIATELY call the lock_language() tool with their choice (en, hi, or ml).\n"
-        f"5. The lock_language tool will confirm in their language.\n"
-        f"6. Then ask how you can help them today.\n\n"
-        f"NEVER switch language unless the customer explicitly asks to change. "
-        f"NEVER auto-detect language from their accent or word choices."
+        f"Call context: inbound call to Manas Group India.\n"
     )
     await session.generate_reply(instructions=greeting_instructions)
 

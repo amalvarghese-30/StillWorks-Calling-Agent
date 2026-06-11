@@ -40,7 +40,7 @@ async def main():
     )
     parser.add_argument(
         "--model-provider",
-        choices=["openai", "groq"],
+        choices=["openai"],
         default=config.DEFAULT_LLM_PROVIDER,
         help="LLM provider",
     )

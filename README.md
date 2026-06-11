@@ -4,15 +4,15 @@ A production-ready **inbound + outbound** voice AI agent for Manas Group India, 
 
 **Brands supported:** John Deere, ACE, Shaktiman, Kirloskar, Bull, Redlands, BCS Ferrari
 
-Powered by **LiveKit**, **Deepgram**, **Groq/OpenAI**, and **Sarvam TTS**.
+Powered by **LiveKit**, **Deepgram**, **OpenAI**, and **Sarvam TTS**.
 
 ---
 
 ## Features
 
 - **Inbound & Outbound Calling** — Answers calls on a dedicated AI number; makes outbound calls for service reminders, follow-ups, promotional offers, and payment follow-ups
-- **Trilingual Support** — Malayalam (default), English, and Hindi with automatic language detection
-- **8 AI Function Tools** — Customer lookup, call transfer, service booking, service status check, product info, financing calculator, callback scheduling, lead logging
+- **Trilingual Support** — Malayalam (default), English, and Hindi with explicit customer language selection (no auto-detection)
+- **12 AI Function Tools** — Customer lookup, call transfer, service booking, service status check, product info, financing calculator, callback scheduling, lead logging, language lock, budget tracking, timeline tracking, quote generation
 - **SQLite Database** — Stores customers, calls, service bookings, products (59 pre-loaded), leads, and follow-ups
 - **Next.js Dashboard** — Web UI for dispatching calls, launching campaigns, monitoring inbound calls, managing service bookings, and tracking leads
 - **SIP Trunking** — Integrated with Vobiz for PSTN connectivity (inbound + outbound)
@@ -41,7 +41,7 @@ Incoming Call ──► SIP Inbound Trunk ──► LiveKit Cloud ◄── SIP 
                    Room Auto-Created    ┌─────┴─────┐
                         │              │  ManasAI   │
                         ▼              │  STT→LLM→TTS│
-                   Agent Joins Room    │  8 Tools   │
+                   Agent Joins Room    │ 12 Tools   │
                         │              └─────┬─────┘
                         ▼                    │
                    Inbound Handler     SQLite DB
@@ -57,7 +57,7 @@ LIvekitAIVoice/
 ├── agent.py                  # Main agent — direction detection, session, dispatcher
 ├── config.py                 # System prompt, language maps, telephony, financing
 ├── database.py               # SQLite schema, CRUD, seed data (59 products)
-├── tools.py                  # 8 function tools for LLM tool calling
+├── tools.py                  # 12 function tools for LLM tool calling
 ├── product_catalog.py        # Product data and search utilities
 ├── inbound_handler.py        # Inbound call flow
 ├── outbound_handler.py       # Outbound dial-out flow
@@ -105,7 +105,7 @@ LIvekitAIVoice/
 - Node.js 18+
 - A [LiveKit Cloud](https://cloud.livekit.io/) account
 - A [Deepgram](https://deepgram.com/) API Key (STT)
-- A [Groq](https://groq.com/) or [OpenAI](https://openai.com/) API Key (LLM)
+- An [OpenAI](https://openai.com/) API Key (LLM)
 - A [Sarvam AI](https://www.sarvam.ai/) API Key (TTS for Malayalam/Hindi)
 - A SIP provider (e.g., Vobiz) with:
   - An outbound trunk for making calls
@@ -136,7 +136,7 @@ cp .env.example .env
 Fill in all required credentials in `.env`:
 - **LiveKit:** `LIVEKIT_URL`, `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET`
 - **Deepgram:** `DEEPGRAM_API_KEY`
-- **Groq/OpenAI:** `GROQ_API_KEY` or `OPENAI_API_KEY`
+- **OpenAI:** `OPENAI_API_KEY`
 - **Sarvam:** `SARVAM_API_KEY`
 - **Vobiz:** `VOBIZ_SIP_*` variables
 - **AI Phone Number:** `MANAS_AI_PHONE_NUMBER`
@@ -185,8 +185,8 @@ python agent.py start
 
 The agent connects to LiveKit and waits for jobs. You should see:
 ```
-INFO:manas-agent:Using Groq LLM
-INFO:manas-agent:Using Sarvam TTS (Voice: anushka)
+INFO:manas-agent:Using OpenAI LLM
+INFO:manas-agent:Using Sarvam TTS (Voice: kavitha)
 ```
 
 ### 2. Start the Dashboard
@@ -223,8 +223,8 @@ python make_call.py --to +919876543210 --language en --model-provider openai --v
 ### 4. Receive Inbound Calls
 
 Call your dedicated AI phone number from any phone. The agent will:
-1. Answer in Malayalam
-2. Detect your language from your first response
+1. Greet in the default language and explicitly ask which language the customer prefers
+2. Lock the language after the customer selects it
 3. Help with product inquiries, service bookings, financing, etc.
 
 ### 5. Launch a Campaign
@@ -251,16 +251,20 @@ Or use the **Campaign** panel on the main dashboard for bulk CSV input.
 
 ## Function Tools
 
-The AI agent has 8 tools it can call during conversations:
+The AI agent has 12 tools it can call during conversations:
 
 | Tool | What It Does |
 |------|-------------|
 | `lookup_user` | Pulls up customer profile, recent calls, active bookings, open leads |
+| `lock_language` | Locks the conversation to one language after customer selection |
 | `transfer_call` | Transfers to a human support agent at the configured support numbers |
 | `book_service` | Creates a service appointment, returns booking reference (SRV-YYYYMMDD-XXXX) |
 | `check_service_status` | Checks status of existing bookings by phone or reference number |
 | `get_product_info` | Searches 59 products across 7 brands, returns specs and price range |
 | `check_financing` | Calculates approximate EMI, shows partner banks and required documents |
+| `generate_quote` | Generates a formal price quote with financing options |
+| `log_budget` | Records the customer's budget range for lead scoring |
+| `log_timeline` | Records the customer's purchase timeline and urgency |
 | `request_callback` | Schedules a human callback with reason and preferred time |
 | `log_inquiry` | Logs a sales lead for follow-up by the human sales team |
 
@@ -313,9 +317,6 @@ The `docker-compose.yml` includes:
 ### Call connects but no audio
 - **Fix:** Check terminal logs. If using OpenAI TTS, ensure you have credits. Switch to Sarvam TTS (`TTS_PROVIDER=sarvam`) for Malayalam/Hindi.
 
-### Error: `model_decommissioned` (Groq)
-- **Fix:** Open `config.py`, update `GROQ_MODEL` to a supported model, restart agent.
-
 ### Error: `404 Not Found` (SIP Trunk)
 - **Fix:** Run `python list_trunks.py`, verify `VOBIZ_SIP_TRUNK_ID` in `.env` matches.
 
@@ -326,7 +327,7 @@ The `docker-compose.yml` includes:
 - **Fix:** Verify the dispatch rule in LiveKit dashboard routes to `manas-agent`. Check `INBOUND_TRUNK_ID` in `.env`.
 
 ### Malayalam TTS not working
-- **Fix:** Ensure `SARVAM_API_KEY` is set and Sarvam provider is available. The agent auto-switches to Sarvam for Malayalam.
+- **Fix:** Ensure `SARVAM_API_KEY` is set and Sarvam provider is available. Sarvam handles Malayalam and Hindi TTS.
 
 ### Database not found by dashboard
 - **Fix:** Set `DATABASE_PATH` in `.env` to the absolute path of `data/manas_group.db`, or ensure the dashboard runs from the project root.
